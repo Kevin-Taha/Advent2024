@@ -20,7 +20,7 @@ ifstream openFileSafe(string& inputFile)
     if(!file.is_open())
     {
         cerr << "Fail to open file" << endl;
-        return {};
+        throw std::exception();
     }
     return file;
 }
