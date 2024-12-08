@@ -12,6 +12,8 @@
 #include <stack>
 using namespace std;
 
+template<typename T>
+using vec2d = vector<vector<T>>;
 
 // Helpers that i'm likely to use in multiple challenges
 
