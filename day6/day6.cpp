@@ -8,6 +8,11 @@ static const unordered_map<char, pair<pair<int, int>, char>> arrowTransform = {
     {'v', {{1, 0}, '<'}}
 };
 
+constexpr bool isInBounds(int x, int y, vector<vector<char>>& arr)
+{
+    return (x >= 0 && y >= 0 && x < arr.size() && y < arr[0].size());
+}
+
 vector<vector<char>> readMap(string inputFile)
 {
     auto file = openFileSafe(inputFile);
@@ -39,6 +44,40 @@ pair<int, int> getGuardLoc(vector<vector<char>>& guardMap)
     return {0,0};
 }
 
+bool isLoop(vector<vector<char>>& guardMap, int startRow, int startCol, char startDir)
+{
+    int i = 0;
+    set<tuple<int, int, char>> visited;
+    pair<int, int> guardLoc {startRow, startCol};
+    char curDir = startDir;
+    auto guardDir = arrowTransform.at(startDir).first;
+    while(isInBounds(guardLoc.first, guardLoc.second, guardMap))
+    {
+        int nextRow = guardLoc.first + guardDir.first;
+        int nextCol = guardLoc.second + guardDir.second;
+        if (!isInBounds(nextRow, nextCol, guardMap)) return false;
+
+        if (guardMap[nextRow][nextCol] == '#')
+        {
+            curDir = arrowTransform.at(curDir).second;
+            guardDir = arrowTransform.at(curDir).first;
+        }
+        else
+        {
+            guardLoc = {nextRow, nextCol};
+        }
+
+        if(visited.count({guardLoc.first, guardLoc.second, curDir}))
+        {
+            return true; 
+        }
+
+        visited.insert({guardLoc.first, guardLoc.second, curDir});
+    }
+
+    return false;
+}
+
 int countGuardPath(vector<vector<char>>& guardMap)
 {
     int pathLen = 0;
@@ -66,17 +105,26 @@ int countGuardPath(vector<vector<char>>& guardMap)
         else
         {
             // If the spot we're leaving from hasn't been visited, mark it and inc pathLen
-            if (guardMap[guardLoc.first][guardLoc.second] == '.')
+            if (pathLen == 0 || guardMap[guardLoc.first][guardLoc.second] == '.')
             {
                 // Mark current spot as visited and then increment pathLen
                 guardMap[guardLoc.first][guardLoc.second] = curDir;
                 pathLen++;
+
+                // Check if making the next space a wall creates a loop (PT 2)
+                char prevChar = exchange(guardMap[nextRow][nextCol], '#');
+                if(isLoop(guardMap, guardLoc.first, guardLoc.second, curDir))
+                {
+                    possibleLoops++;
+                }
+                //possibleLoops += isLoop(guardMap, guardLoc.first, guardLoc.second, curDir);
+                guardMap[nextRow][nextCol] = prevChar;
             }
 
             guardLoc = {nextRow, nextCol};
         }
 
-    } while (guardLoc.first >= 0 && guardLoc.first < guardMap.size() && guardLoc.second >= 0 && guardLoc.second < guardMap[0].size());
+    } while (isInBounds(guardLoc.first, guardLoc.second, guardMap));
     
     cout << "Possible obstruction loops: " << possibleLoops << endl;
     return pathLen;
