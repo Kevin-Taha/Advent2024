@@ -52,3 +52,9 @@ void printVector(vector<c>& vec)
     }
     cout << endl;
 }
+
+template<typename T>
+constexpr bool isInBounds(int x, int y, vector<vector<T>>& arr)
+{
+    return (x >= 0 && y >= 0 && x < arr.size() && y < arr[0].size());
+}

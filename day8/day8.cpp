@@ -16,14 +16,44 @@ vec2d<char> readFile(string inputFile)
 int countAntinodeLocs(vec2d<char>& antennas)
 {
     int numUnique = 0;
+    unordered_map<char, vector<pair<int, int>>> mp;
+    vec2d<bool> antiNodes (antennas.size(), vector<bool>(antennas[0].size(), false));
 
+    for(int i = 0; i < antennas.size(); i++)
+    {
+        for(int j = 0; j < antennas[0].size(); j++)
+        {
+            char loc = antennas[i][j];
+            if (loc != '.')
+            {
+                auto& sameFreq = mp[loc];
+                
+                // First compute the antinodes with all other existing antennas of the same frequency
+                for(auto& other : sameFreq)
+                {
+                    // Direction vector from new antenna to other  
+                    pair<int, int> diffVec {other.first - i, other.second - j};
+                    // First antinode is other + distance
+                    pair<int, int> posAntinode{other.first + diffVec.first, other.second + diffVec.second};
+                    // Second antinode is new antenna - distance
+                    pair<int, int> newAntinode{i - diffVec.first, j - diffVec.second};
 
+                    for(auto [antiRow, antiCol] : {posAntinode, newAntinode})
+                    {
+                        // If row, col is not already an antinode, mark it
+                        if (isInBounds(antiRow, antiCol, antiNodes) && !antiNodes[antiRow][antiCol])
+                        {
+                            numUnique++;
+                            antiNodes[antiRow][antiCol] = true;
+                        }
+                    }
+                }
 
-
-
-
-
-
+                // add new antenna to list
+                sameFreq.emplace_back(i, j);
+            }
+        }
+    }
 
     return numUnique;
 }
