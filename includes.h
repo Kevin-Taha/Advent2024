@@ -10,6 +10,8 @@
 #include <array>
 #include <unordered_set>
 #include <stack>
+#include <list>
+#include <cstdint>
 using namespace std;
 
 template<typename T>

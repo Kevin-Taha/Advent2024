@@ -1,5 +1,12 @@
 #include "../includes.h"
 
+
+struct MemoryChunk
+{
+    int id;
+    int chunkSize;
+};
+
 vector<int> readInput(string inputFile)
 {
     auto file = openFileSafe(inputFile);
@@ -34,6 +41,23 @@ vector<int> InputToIdString(vector<int>& nums)
         isFile = !isFile;
     }
     return out;
+}
+
+// Part 2
+list<MemoryChunk> InputToMemoryChunkList(vector<int>& nums)
+{
+    list<MemoryChunk> chunkList;
+    int curId = 0;
+    bool isFile = true;
+
+    for(auto& i : nums)
+    {
+        int curNum = (isFile) ? curId++ : -1;
+        chunkList.emplace_back(curNum, i);
+        isFile = !isFile;
+    }
+
+    return chunkList;
 }
 
 uint64_t calcCheckSum(vector<int>& nums)
@@ -74,18 +98,24 @@ uint64_t calcCheckSum(vector<int>& nums)
     return checkSum;
 }   
 
+uint64_t calcCheckSum2(vector<int>& nums)
+{
+    auto memory = InputToMemoryChunkList(nums);
+    int id = -1;
+
+
+
+   // return checkSum;
+}
+
 int main()
 {
     auto numArr = readInput("input.txt");
-    auto checkSum = calcCheckSum(numArr);
-    cout << "Pt 1 Checksum: " << checkSum << endl;
+    //auto checkSum = calcCheckSum(numArr);
+    //cout << "Pt 1 Checksum: " << checkSum << endl;
 
-
-    //vector<int> t {1,2,3,4,5};
-    //auto t1 = InputToIdString(t);
-    //printVector(t1);
-    //calcCheckSum(t);
-
+    auto checkSum = calcCheckSum2(numArr);
+    cout << "Pt 2 Checksum: " << checkSum << endl;
 
     return 0;
 }
