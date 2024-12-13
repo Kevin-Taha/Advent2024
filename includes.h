@@ -12,6 +12,7 @@
 #include <stack>
 #include <list>
 #include <cstdint>
+#include <cmath>
 using namespace std;
 
 template<typename T>
